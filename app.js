@@ -85,6 +85,13 @@
 
   function toHex(value) { return value.toString(16).padStart(2, '0').toUpperCase(); }
   function output8(value6) { return value6 * 4; }
+  function relativeLuminance(r, g, b) {
+    const linear = value => {
+      const channel = value / 255;
+      return channel <= 0.04045 ? channel / 12.92 : ((channel + 0.055) / 1.055) ** 2.4;
+    };
+    return 0.2126 * linear(r) + 0.7152 * linear(g) + 0.0722 * linear(b);
+  }
 
   function render(source = 'rgb') {
     if (source === 'rgb') {
@@ -95,6 +102,7 @@
     const r8 = output8(state.r), g8 = output8(state.g), b8 = output8(state.b);
     const hex = `#${toHex(r8)}${toHex(g8)}${toHex(b8)}`;
     document.documentElement.style.setProperty('--selected', hex);
+    document.documentElement.style.setProperty('--preview-ink', relativeLuminance(r8, g8, b8) > 0.179 ? '#101114' : '#FFFFFF');
     $('hexValue').textContent = hex;
     $('rgb6Value').textContent = `${state.r}, ${state.g}, ${state.b}`;
     $('rgb8Value').textContent = `${r8}, ${g8}, ${b8}`;
