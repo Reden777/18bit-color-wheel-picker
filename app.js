@@ -6,6 +6,8 @@
   const ctx = canvas.getContext('2d', { alpha: true });
   const wrap = $('wheelWrap');
   const cursor = $('wheelCursor');
+  let canvasSize = 0;
+  let activePointerId = null;
   const sliders = {
     r: $('redSlider'),
     g: $('greenSlider'),
@@ -37,8 +39,24 @@
     return [h, max ? d / max : 0, max];
   }
 
+  function setupCanvas() {
+    const rect = canvas.getBoundingClientRect();
+    const size = Math.max(1, rect.width);
+    const dpr = window.devicePixelRatio || 1;
+    const pixelWidth = Math.round(size * dpr);
+    const pixelHeight = Math.round(rect.height * dpr);
+
+    if (canvas.width !== pixelWidth || canvas.height !== pixelHeight) {
+      canvas.width = pixelWidth;
+      canvas.height = pixelHeight;
+    }
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    canvasSize = size;
+  }
+
   function drawWheel() {
-    const size = canvas.width;
+    setupCanvas();
+    const size = canvasSize;
     const center = size / 2;
     const radius = size * 0.48;
     ctx.clearRect(0, 0, size, size);
@@ -109,11 +127,22 @@
   }
 
   wrap.addEventListener('pointerdown', (event) => {
+    activePointerId = event.pointerId;
     wrap.setPointerCapture(event.pointerId);
     chooseFromWheel(event);
   });
   wrap.addEventListener('pointermove', (event) => {
-    if (wrap.hasPointerCapture(event.pointerId)) chooseFromWheel(event);
+    if (event.pointerId === activePointerId && wrap.hasPointerCapture(event.pointerId)) chooseFromWheel(event);
+  });
+  function finishPointer(event) {
+    if (event.pointerId !== activePointerId) return;
+    if (wrap.hasPointerCapture(event.pointerId)) wrap.releasePointerCapture(event.pointerId);
+    activePointerId = null;
+  }
+  wrap.addEventListener('pointerup', finishPointer);
+  wrap.addEventListener('pointercancel', finishPointer);
+  wrap.addEventListener('lostpointercapture', (event) => {
+    if (event.pointerId === activePointerId) activePointerId = null;
   });
 
   ['r', 'g', 'b'].forEach(channel => sliders[channel].addEventListener('input', () => {
@@ -148,6 +177,9 @@
   $('infoButton').addEventListener('click', () => toggleInfo($('infoPanel').hidden));
   $('closeInfo').addEventListener('click', () => toggleInfo(false));
   document.addEventListener('keydown', event => { if (event.key === 'Escape') toggleInfo(false); });
+
+  const resizeObserver = new ResizeObserver(() => drawWheel());
+  resizeObserver.observe(wrap);
 
   drawWheel();
   render('rgb');
