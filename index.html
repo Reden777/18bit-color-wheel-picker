@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#101114">
+  <title>18-bit Color Wheel</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="#" aria-label="18-bit color wheel home">
+      <span class="brand-mark" aria-hidden="true"></span>
+      <span>18BIT</span>
+    </a>
+    <p>262,144 native colors</p>
+    <button class="info-button" id="infoButton" type="button" aria-expanded="false" aria-controls="infoPanel">ABOUT 6-BIT</button>
+  </header>
+
+  <main>
+    <section class="hero" aria-labelledby="pageTitle">
+      <div class="eyebrow">NO DITHERING. NO FRC. JUST NATIVE COLOR.</div>
+      <h1 id="pageTitle">COLOR, AT THE<br><em>HARDWARE LEVEL.</em></h1>
+      <p class="intro">Explore the complete color space of a 6-bit-per-channel display. Every selection lands on a native hardware value.</p>
+    </section>
+
+    <section class="picker" aria-label="18-bit color picker">
+      <div class="wheel-column">
+        <div class="wheel-wrap" id="wheelWrap">
+          <canvas id="colorWheel" width="720" height="720" aria-label="Hue and saturation color wheel"></canvas>
+          <div class="wheel-cursor" id="wheelCursor" aria-hidden="true"></div>
+          <div class="wheel-center" id="wheelCenter" aria-hidden="true"></div>
+        </div>
+        <label class="value-control">
+          <span>VALUE</span>
+          <input id="valueSlider" type="range" min="0" max="63" value="52" aria-label="Color brightness, 6-bit value">
+          <output id="valueOutput" for="valueSlider">52 / 63</output>
+        </label>
+      </div>
+
+      <div class="controls-column">
+        <div class="preview" id="preview">
+          <span>SELECTED COLOR</span>
+          <button id="copyHex" type="button" title="Copy hex value">
+            <strong id="hexValue">#D03030</strong>
+            <small id="copyLabel">COPY HEX</small>
+          </button>
+        </div>
+
+        <div class="channel-controls" aria-label="RGB channel controls">
+          <label class="channel red">
+            <span class="channel-name">RED</span>
+            <input id="redSlider" type="range" min="0" max="63" value="52">
+            <output id="redOutput" for="redSlider">52</output>
+          </label>
+          <label class="channel green">
+            <span class="channel-name">GREEN</span>
+            <input id="greenSlider" type="range" min="0" max="63" value="12">
+            <output id="greenOutput" for="greenSlider">12</output>
+          </label>
+          <label class="channel blue">
+            <span class="channel-name">BLUE</span>
+            <input id="blueSlider" type="range" min="0" max="63" value="12">
+            <output id="blueOutput" for="blueSlider">12</output>
+          </label>
+        </div>
+
+        <div class="readout-grid">
+          <div><span>6-BIT RGB</span><strong id="rgb6Value">52, 12, 12</strong></div>
+          <div><span>8-BIT OUTPUT</span><strong id="rgb8Value">208, 48, 48</strong></div>
+          <div><span>BINARY</span><strong id="binaryValue">110100 · 001100 · 001100</strong></div>
+          <div><span>COLOR INDEX</span><strong id="indexValue">213,772</strong></div>
+        </div>
+        <p class="native-badge"><span aria-hidden="true">●</span> NATIVE 6-BIT COLOR — 0% FRC</p>
+      </div>
+    </section>
+
+    <aside class="info-panel" id="infoPanel" hidden>
+      <button id="closeInfo" type="button" aria-label="Close information">×</button>
+      <p class="eyebrow">THE SHORT VERSION</p>
+      <h2>Why 18-bit?</h2>
+      <p>Many displays use 6 physical bits for each red, green, and blue channel. That makes 64 × 64 × 64 — exactly 262,144 native colors.</p>
+      <p>Eight-bit values between native levels may be simulated by rapidly alternating pixels across frames (FRC). This picker only emits channel values divisible by four, so the panel can display them without temporal dithering.</p>
+      <p class="info-note">Native 8-bit values: 0, 4, 8, 12 … 248, 252.</p>
+    </aside>
+  </main>
+
+  <footer>
+    <span>18-BIT COLOR WHEEL</span>
+    <span>64 LEVELS / CHANNEL</span>
+    <span>BUILT FOR THE PIXELS YOU ACTUALLY HAVE</span>
+  </footer>
+  <script src="app.js"></script>
+</body>
+</html>

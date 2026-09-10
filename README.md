@@ -1,18 +1,36 @@
-# 18bit-color-wheel-picker
+# 18-bit Color Wheel + Picker
 
-A 18 Bit (6 bit per color) color wheel and picker. I saw nobody had made a wheel+picker for 18 Bit displays (also known as 6Bit+FRC, common in ~$100 displays, and in older cheap displays that are still around)
+An interactive color wheel for exploring the complete **262,144-color** space of a native 18-bit display (6 bits per red, green, and blue channel).
 
-It allows you to look at the full 262,144 color spectrum, and choose any color from it.
+The picker constrains each channel to one of 64 hardware levels. In an 8-bit color space those levels are `0, 4, 8, 12 … 248, 252`, so every color it produces is native and requires no frame-rate-control (FRC) dithering.
 
-Available colors can be derived as the multiples of decimal 4, hex 0/00/4/8/C/FF, or 
+## Features
 
-"Native 6-bit levels in an 8-bit space = 0, 4, 8, 12, 16, 20… 248, 252
+- Hue/saturation wheel with a separate 6-bit value control
+- Direct red, green, and blue controls for reaching every possible color
+- 6-bit, 8-bit, hexadecimal, binary, and color-index readouts
+- One-click hexadecimal value copying
+- Responsive mouse, touch, and mobile layout
+- No dependencies or build step
 
-When an 8-bit value isn't a multiple of 4, the panel's timing controller (TCON) has to fake it across multiple refresh frames:
+## Run locally
 
-Remainder 0 (...00 binary): Native. No flickering. (0% FRC)
-Remainder 1 (...01 binary): Alternates 1 frame high, 3 frames low (25% duty cycle).
-Remainder 2 (...10 binary): Alternates 1 frame high, 1 frame low (50% duty cycle / maximum oscillation frequency).
-Remainder 3 (...11 binary): Alternates 3 frames high, 1 frame low (75% duty cycle)."
+Open `index.html` directly in a modern browser, or serve the directory with any static file server:
 
-00 and FF in particular are safe because they clamp to the darkest and brightest hardware levels, respectively.
+```sh
+python -m http.server 8000
+```
+
+Then visit <http://localhost:8000>.
+
+## How the conversion works
+
+Each 6-bit channel is an integer from `0` through `63`. The app maps it into an 8-bit CSS channel by multiplying it by four:
+
+```text
+8-bit output = 6-bit value × 4
+```
+
+Eight-bit channel values that fall between these steps may be simulated on a 6-bit panel by alternating between adjacent hardware levels over multiple frames. Values emitted by this picker always have a remainder of zero and therefore use 0% FRC.
+
+`#FFFFFF` can also be safe on real panels because the maximum input clamps to their brightest hardware level, but it duplicates that endpoint. This picker uses `#FCFCFC` as its unique maximum so the represented space remains exactly 64³ colors.
